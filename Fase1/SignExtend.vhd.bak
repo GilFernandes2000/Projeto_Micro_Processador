@@ -1,0 +1,13 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity SignExtend is
+	port(InP : in std_logic_vector(6 downto 0);
+		  OutP : out std_logic_vector(7 downto 0));
+end SignExtend;
+
+architecture Behavioral of SignExtend is
+begin
+	OutP <= "0" & InP;
+end Behavioral;
+		  

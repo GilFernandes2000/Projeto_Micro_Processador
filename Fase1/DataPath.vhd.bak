@@ -1,0 +1,79 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity DataPath is
+	generic(M : positive := 8);
+	port(clk : in std_logic;
+		  EnPC : in std_logic;
+		  RI : in std_logic;
+		  RegDst : in std_logic;
+		  RegWR : in std_logic;
+		  ALUSrc : in std_logic;
+		  ALUOp : in std_logic_vector(3 downto 0);
+		  MemWr : in std_logic;
+		  MemToReg : in std_logic);
+end DataPath;
+
+architecture Structural of DataPath is
+
+	signal s_RDIM : std_logic_vector(16 downto 0);
+	signal s_RDM, s_RD1, s_RD2, s_Mux2, s_Mux3, s_res, s_Extend: std_logic_vector((M-1) downto 0);
+	signal s_cnt : std_logic_vector(((M/2)-1)downto 0);
+	signal s_Mux1 : std_logic_vector(2 downto 0);
+	
+begin
+	pc: entity work.PC(Behavioral)
+				generic map(N => M/2);
+				port map(clk => clk,
+							En => EnPC,
+							cnt => s_snt((N-1) downto 0);
+							
+	imemory: entity work.IMemory(Behavioral)
+				generic map(N => M/2);
+				port map(En => Ri,
+							RA => s_cnt,
+							RD => s_RDIM(15 downto 0);
+	
+	mux1 : entity work.Mux2_1(Behavioral)
+				port map(dataIn0 => s_RDIM(6 downto 4),
+							dataIn1 => s_RDIM(9 downto 7),
+							dataOut => s_Mux1);
+							
+	regists : entity work.Registers(Behavioral)
+				generic map(N => M);
+				port map(RA1 => s_RDIM(12 downto 10),
+							RA2 => s_RDIM(9 downto 7),
+							WA => s_Mux1,
+							WD => s_Mux3,
+							WE => RegWr,
+							RD1 => s_RD1,
+							RD2 => s_RD2);
+	
+	mux2 : entity work.Mux2_1_8bits(Behaviroal)
+				port map(dataIn0 => s_RD2,
+							dataIn1 => s_Entend,
+							dataOut => s_Mux2);
+							
+	alu : entity work.ALUN(Behavioral)
+				generic map(N => M);
+				port map(op1 => s_RD1,
+							op2 => s_Mux2,
+							ALUOp => ALUOp,
+							res => s_res);
+						
+	dmemory : entity work.DMemory(Behavioral)
+				generic map(N => M);
+				port map(WE => MemWr,
+							Addr => s_res,
+							WD => s_RD2,
+							RD => s_RDM);
+						
+	mux3 : entity work.Mux2_1_8bits(Behavioral)
+				port map(dataIn1 => s_RDM,
+							dataIn0 => s_res,
+							dataOut => s_Mux3);
+		
+	signex : entity work.SignExtend(Behavioral)
+				port map(InP => s_RDIM(6 downto 0),
+							OutP => s_Extend);
+end Structural;

@@ -1,0 +1,40 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity IMemory_tb is
+end IMemory_tb;
+
+architecture Stimulus of IMemory_tb is
+
+	signal s_En: std_logic;
+	signal s_RA : std_logic_vector(3 downto 0);
+	signal s_RD : std_logic_vector(15 downto 0);
+	
+begin
+	uut : entity work.IMemory(Behavioral)
+				port map(En => s_EN,
+							RA => s_RA,
+							RD => s_RD);
+							
+	stim_proc : process
+	begin
+		wait for 10 ns;
+		s_En <= '1';
+		s_RA <= x"0";
+		wait for 50 ns;
+		s_RA <= x"1";
+		wait for 50 ns;
+		s_RA <= x"2";
+		wait for 50 ns;
+		s_RA <= x"3";
+		wait for 50 ns;
+		s_RA <= x"4";
+		wait for 50 ns;
+		s_RA <= x"5";
+		wait for 50 ns;
+		s_RA <= x"6";
+		wait for 50 ns;
+		s_RA <= x"7";
+		wait for 50 ns;
+	end process;
+end Stimulus;
